@@ -1,0 +1,17 @@
+{
+  "name": "google-home",
+  "version": "1.0.0",
+  "description": "google-home test project",
+  "main": "main.js",
+  "license": "MIT",
+  "dependencies": {
+    "beebotte": "^1.2.2",
+    "config": "^1.29.4",
+    "google-home-notifier": "noelportugal/google-home-notifier.git#master",
+    "js-yaml": "^3.10.0",
+    "request": "^2.83.0"
+  },
+  "devDependencies": {
+    "eslint-config-google": "^0.9.1"
+  }
+}
