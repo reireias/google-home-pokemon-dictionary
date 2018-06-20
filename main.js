@@ -55,7 +55,7 @@ const search = (name, callback) => {
     request.get(options, (error, response, body) => {
       if (response.statusCode === 200) {
         let message = createNotifyMessage(body)
-        callback(message)
+        callback(null, message)
       } else {
         console.error(response)
         callback(error, 'エラーが発生しました。')
