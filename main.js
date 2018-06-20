@@ -58,11 +58,11 @@ const search = (name, callback) => {
         callback(message)
       } else {
         console.error(response)
-        callback('エラーが発生しました。')
+        callback(error, 'エラーが発生しました。')
       }
     })
   } else {
-    callback(name + 'は見つかりませんでした。')
+    callback(new Error('not found'), name + 'は見つかりませんでした。')
   }
 }
 
@@ -87,9 +87,13 @@ const createNotifyMessage = body => {
 
 /**
  * notify to google home
+ * @param {Error} error The error object
  * @param {string} message The message for notification
  */
-const notify = message => {
+const notify = (error, message) => {
+  if (error) {
+    console.error(error)
+  }
   console.info(message)
   googlehome.notify(message, response => {
     console.info(response)
