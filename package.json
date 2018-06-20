@@ -7,9 +7,11 @@
   "dependencies": {
     "beebotte": "^1.2.2",
     "config": "^1.29.4",
+    "express": "^4.16.3",
     "google-home-notifier": "noelportugal/google-home-notifier.git#master",
     "js-yaml": "^3.10.0",
-    "request": "^2.83.0"
+    "request": "^2.83.0",
+    "voicetext": "^0.0.7"
   },
   "devDependencies": {
     "eslint": "^4.19.1",

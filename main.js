@@ -1,20 +1,28 @@
 'use strict'
 const beebotte = require('beebotte')
 const config = require('config')
+const express = require('express')
 const fs = require('fs')
 const googlehome = require('google-home-notifier')
+const path = require('path')
 const request = require('request')
+const VoiceText = require('voicetext')
 
 const searchUrl = 'https://pokeapi.co/api/v2/pokemon-species/'
 const nameIdMap = JSON.parse(fs.readFileSync('./pokemon.json', 'utf-8'))
+const voice = new VoiceText(config.voice.key)
+const app = express()
 
 /**
  * main function
  */
 const main = () => {
-  googlehome.ip(config.googlehome.ip, config.googlehome.language)
-  subscribe()
-  // search('フシギダネ', notify);
+  app.use(express.static(path.join(__dirname, '/tmp')))
+  app.listen(3000, () => {
+    googlehome.ip(config.googlehome.ip, config.googlehome.language)
+    subscribe()
+    // search('フシギダネ', notify);
+  })
 }
 
 /**
@@ -82,6 +90,7 @@ const createNotifyMessage = body => {
   })
   let message =
     names[0].name + '。' + genera[0].genus + '。' + flavorTexts[0].flavor_text
+  message = message.replace(/\s/g, '')
   return message
 }
 
@@ -95,7 +104,13 @@ const notify = (error, message) => {
     console.error(error)
   }
   console.info(message)
-  googlehome.notify(message, response => {
+  voice.speaker(voice.SPEAKER.HIKARI).speak(message, (error, buf) => {
+    if (error) {
+      console.error(error)
+    }
+    fs.writeFileSync('./tmp/tmp.wav', buf, 'binary')
+  })
+  googlehome.play('http://' + config.server.ip + ':3000/tmp.wav', response => {
     console.info(response)
   })
 }
