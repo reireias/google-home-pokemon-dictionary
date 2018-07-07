@@ -1,5 +1,4 @@
-'use strict'
-const beebotte = require('beebotte')
+const bodyParser = require('body-parser')
 const config = require('config')
 const express = require('express')
 const fs = require('fs')
@@ -13,72 +12,67 @@ const nameIdMap = JSON.parse(fs.readFileSync('./pokemon.json', 'utf-8'))
 const voice = new VoiceText(config.voice.key)
 const app = express()
 
-/**
- * main function
- */
 const main = () => {
+  googlehome.ip(config.googlehome.ip, config.googlehome.language)
   app.use(express.static(path.join(__dirname, '/tmp')))
-  app.listen(3000, () => {
-    googlehome.ip(config.googlehome.ip, config.googlehome.language)
-    subscribe()
-    // search('フシギダネ', notify);
+  app.use(bodyParser.json())
+  app.post('/pokemon', postPokemon)
+  app.listen(config.port, () => {
+    console.log('started')
   })
 }
 
-/**
- * subscribe beebotte channel
- */
-const subscribe = () => {
-  let transport = {
-    type: 'mqtt',
-    token: config.beebotte.token
-  }
-  let channel = config.beebotte.channel
-  let resource = config.beebotte.resource
-  let client = new beebotte.Stream({ transport: transport })
-
-  client.on('connected', () => {
-    client
-      .subscribe(channel, resource, message => {
-        let name = message.data
-        search(name, notify)
-      })
-      .on('subscribed', sub => {
-        console.info('subscribed.')
-      })
-  })
+const postPokemon = (req, res) => {
+  var promise = Promise.resolve(req.body.name)
+  promise.then(search).then(notify).catch(handleError)
+  res.send('ok')
 }
 
-/**
- * search flavor text from pokeapi
- * @param {string} name The name of target
- * @param {function} callback The callback function
- */
-const search = (name, callback) => {
-  if (nameIdMap[name]) {
-    let options = {
-      url: searchUrl + nameIdMap[name],
-      json: true
-    }
-    request.get(options, (error, response, body) => {
-      if (response.statusCode === 200) {
-        let message = createNotifyMessage(body)
-        callback(null, message)
-      } else {
-        console.error(response)
-        callback(error, 'エラーが発生しました。')
+const search = name => {
+  return new Promise((resolve, reject) => {
+    if (nameIdMap[name]) {
+      let options = {
+        url: searchUrl + nameIdMap[name],
+        json: true
       }
-    })
-  } else {
-    callback(new Error('not found'), name + 'は見つかりませんでした。')
-  }
+      request.get(options, (error, response, body) => {
+        if (error) {
+          reject(error)
+        }
+        if (response.statusCode === 200) {
+          let message = createNotifyMessage(body)
+          resolve(message)
+        } else {
+          reject(new Error('検索時にエラーが発生しました。'))
+        }
+      })
+    } else {
+      reject(new Error('ポケモンが見つかりませんでした。'))
+    }
+  })
 }
 
-/**
- * create message for notify google home
- * @param {object} body Search response body (json)
- * @return {string}
- */
+const notify = message => {
+  return new Promise((resolve, reject) => {
+    console.info(message)
+    voice.speaker(voice.SPEAKER.HIKARI).speak(message, (error, buf) => {
+      if (error) {
+        reject(error)
+      }
+      fs.writeFileSync('./tmp/tmp.wav', buf, 'binary')
+      googlehome.play(`http://${config.server.ip}:${config.port}/tmp.wav`, response => {
+        console.info(response)
+      })
+    })
+  })
+}
+
+const handleError = error => {
+  googlehome.notify(error.message, () => {
+    console.error(error)
+  })
+}
+
 const createNotifyMessage = body => {
   let language = config.pokeapi.language
   let ftLanguage = config.pokeapi.flavorText.language
@@ -92,27 +86,6 @@ const createNotifyMessage = body => {
     names[0].name + '。' + genera[0].genus + '。' + flavorTexts[0].flavor_text
   message = message.replace(/\s/g, '')
   return message
-}
-
-/**
- * notify to google home
- * @param {Error} error The error object
- * @param {string} message The message for notification
- */
-const notify = (error, message) => {
-  if (error) {
-    console.error(error)
-  }
-  console.info(message)
-  voice.speaker(voice.SPEAKER.HIKARI).speak(message, (error, buf) => {
-    if (error) {
-      console.error(error)
-    }
-    fs.writeFileSync('./tmp/tmp.wav', buf, 'binary')
-  })
-  googlehome.play('http://' + config.server.ip + ':3000/tmp.wav', response => {
-    console.info(response)
-  })
 }
 
 if (require.main === module) {
