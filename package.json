@@ -7,7 +7,6 @@
   "dependencies": {
     "ava": "^1.4.1",
     "beebotte": "^1.2.2",
-    "body-parser": "^1.18.3",
     "config": "^1.29.4",
     "express": "^4.16.3",
     "google-home-notifier": "^1.2.0",

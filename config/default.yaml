@@ -6,4 +6,7 @@ pokeapi:
   flavorText:
     language: 'ja'
     version: 'omega-ruby'
-port: '8080'
+beebotte:
+  channel: 'your channel'
+  resource: 'your resource'
+  token: 'your token'
