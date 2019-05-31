@@ -5,9 +5,3 @@ env:
   node: true
 extends: 'standard'
 # add your custom rules here
-rules:
-  space-before-function-paren:
-    - 'error'
-    - anonymous: 'always'
-      named: 'ignore'
-      asyncArrow: 'always'

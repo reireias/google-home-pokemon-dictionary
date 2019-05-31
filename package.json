@@ -4,6 +4,9 @@
   "description": "Pokemon Dictionary for GoogleHome.",
   "main": "src/main.js",
   "license": "MIT",
+  "scripts": {
+    "lint": "eslint --ext .js --ignore-path .gitignore ."
+  },
   "dependencies": {
     "ava": "^1.4.1",
     "beebotte": "^1.2.2",
@@ -15,12 +18,12 @@
     "voicetext": "^0.0.7"
   },
   "devDependencies": {
-    "eslint": "^4.19.1",
-    "eslint-config-google": "^0.9.1",
-    "eslint-config-standard": "^11.0.0",
+    "eslint": "^5.16.0",
+    "eslint-config-google": "^0.13.0",
+    "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.12.0",
-    "eslint-plugin-node": "^6.0.1",
-    "eslint-plugin-promise": "^3.8.0",
-    "eslint-plugin-standard": "^3.1.0"
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^4.0.0"
   }
 }
