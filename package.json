@@ -1,10 +1,11 @@
 {
-  "name": "google-home",
+  "name": "googlehome-pokemon-dictionary",
   "version": "1.0.0",
-  "description": "google-home test project",
-  "main": "main.js",
+  "description": "Pokemon Dictionary for GoogleHome.",
+  "main": "src/main.js",
   "license": "MIT",
   "dependencies": {
+    "ava": "^1.4.1",
     "beebotte": "^1.2.2",
     "body-parser": "^1.18.3",
     "config": "^1.29.4",
