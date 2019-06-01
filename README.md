@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/reireias/google-home-pokemon-dictionary.svg?branch=master)](https://travis-ci.org/reireias/google-home-pokemon-dictionary)
 # google-home-pokemon-dictionary
 Pokemon dictionaryn Google Home
 
@@ -11,13 +12,12 @@ install requires
 install node modules
 
 ```sh
-$ npm install
-or
 $ yarn install
+$ yarn sed
 ```
 
 run
 
 ```sh
-$ node main.js
+$ yarn start
 ```
