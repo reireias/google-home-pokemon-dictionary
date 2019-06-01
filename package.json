@@ -5,27 +5,35 @@
   "main": "src/main.js",
   "license": "MIT",
   "scripts": {
+    "start": "node src/main.js",
+    "sed": "sed -i -e 's/rst.getaddrinfo()/rst.getaddrinfo({families:[4]})/g' node_modules/mdns/lib/browser.js",
     "lint": "eslint --ext .js --ignore-path .gitignore .",
     "test": "ava --varbose",
     "watch:test": "ava --watch"
   },
   "dependencies": {
+    "@shooontan/voicetext": "^0.0.2",
     "ava": "^1.4.1",
+    "axios": "^0.19.0",
     "beebotte": "^1.2.2",
     "config": "^1.29.4",
+    "dotenv": "^8.0.0",
     "express": "^4.16.3",
-    "google-home-notifier": "^1.2.0",
+    "google-home-notifier": "https://github.com/reireias/google-home-notifier/tarball/master",
+    "internal-ip": "^4.3.0",
     "js-yaml": "^3.10.0",
-    "request": "^2.83.0",
-    "voicetext": "^0.0.7"
+    "request": "^2.83.0"
   },
   "devDependencies": {
     "eslint": "^5.16.0",
     "eslint-config-google": "^0.13.0",
+    "eslint-config-prettier": "^4.3.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.12.0",
     "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-promise": "^4.1.1",
-    "eslint-plugin-standard": "^4.0.0"
+    "eslint-plugin-standard": "^4.0.0",
+    "prettier": "^1.17.1"
   }
 }

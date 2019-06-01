@@ -1,120 +1,64 @@
 'use strict'
-const beebotte = require('beebotte')
-const config = require('config')
-const express = require('express')
+require('dotenv').config()
 const fs = require('fs')
-const googlehome = require('google-home-notifier')
 const path = require('path')
-const request = require('request')
-const VoiceText = require('voicetext')
+const pokemon = require('./pokemon')
+const voice = require('./voice')
+const beebotte = require('beebotte')
+const express = require('express')
+const googlehome = require('google-home-notifier')
+const internalIp = require('internal-ip')
 
-const searchUrl = 'https://pokeapi.co/api/v2/pokemon-species/'
-const nameIdMap = JSON.parse(fs.readFileSync('./pokemon.json', 'utf-8'))
-const voice = new VoiceText(config.voice.key)
+const GOOGLE_HOME_NAME = process.env.GOOGLE_HOME_NAME
+const GOOGLE_HOME_LANG = process.env.GOOGLE_HOME_LANG || 'ja'
+const TEMP_DIR = fs.mkdtempSync('/tmp/pokemon')
+
 const app = express()
-
-/**
- * main function
- */
-const main = () => {
-  app.use(express.static(path.join(__dirname, '/tmp')))
-  app.listen(3000, () => {
-    googlehome.ip(config.googlehome.ip, config.googlehome.language)
-    subscribe()
-    // search('フシギダネ', notify);
-  })
-}
-
-/**
- * subscribe beebotte channel
- */
-const subscribe = () => {
-  let transport = {
+const beebotteClient = new beebotte.Stream({
+  transport: {
     type: 'mqtt',
-    token: config.beebotte.token
+    token: process.env.BEEBOTTE_CHANNEL_TOKEN
   }
-  let channel = config.beebotte.channel
-  let resource = config.beebotte.resource
-  let client = new beebotte.Stream({ transport: transport })
+})
+const ip = internalIp.v4.sync()
 
-  client.on('connected', () => {
-    client
-      .subscribe(channel, resource, message => {
-        let name = message.data
-        search(name, notify)
-      })
-      .on('subscribed', sub => {
-        console.info('subscribed.')
-      })
+const main = () => {
+  // connect to google home
+  googlehome.device(GOOGLE_HOME_NAME, GOOGLE_HOME_LANG)
+
+  // subscribe beebotte
+  beebotteClient.on('connected', subscribe)
+
+  // start express server
+  app.use(express.static(TEMP_DIR))
+  app.listen(3000)
+}
+
+const subscribe = () => {
+  beebotteClient.subscribe(
+    process.env.BEEBOTTE_CHANNEL,
+    process.env.BEEBOTTE_RESOURCE,
+    handleMessage
+  )
+}
+
+const handleMessage = message => {
+  ;(async () => {
+    const name = message.data
+    const data = await pokemon.getData(name)
+    await notify(data)
+  })()
+}
+
+const notify = async data => {
+  const message = `${data.name}。${data.genus}。${data.flavorText}`
+  const filePath = await voice.download(message, TEMP_DIR)
+  const filename = path.basename(filePath)
+  googlehome.play(`http://${ip}:3000/${filename}`, () => {
+    setTimeout(() => {
+      fs.unlinkSync(filePath)
+    }, 10000)
   })
 }
 
-/**
- * search flavor text from pokeapi
- * @param {string} name The name of target
- * @param {function} callback The callback function
- */
-const search = (name, callback) => {
-  if (nameIdMap[name]) {
-    let options = {
-      url: searchUrl + nameIdMap[name],
-      json: true
-    }
-    request.get(options, (error, response, body) => {
-      if (response.statusCode === 200) {
-        let message = createNotifyMessage(body)
-        callback(null, message)
-      } else {
-        console.error(response)
-        callback(error, 'エラーが発生しました。')
-      }
-    })
-  } else {
-    callback(new Error('not found'), name + 'は見つかりませんでした。')
-  }
-}
-
-/**
- * create message for notify google home
- * @param {object} body Search response body (json)
- * @return {string}
- */
-const createNotifyMessage = body => {
-  let language = config.pokeapi.language
-  let ftLanguage = config.pokeapi.flavorText.language
-  let version = config.pokeapi.flavorText.version
-  let names = body.names.filter(name => language === name.language.name)
-  let genera = body.genera.filter(genus => language === genus.language.name)
-  let flavorTexts = body.flavor_text_entries.filter(text => {
-    return ftLanguage === text.language.name && version === text.version.name
-  })
-  let message =
-    names[0].name + '。' + genera[0].genus + '。' + flavorTexts[0].flavor_text
-  message = message.replace(/\s/g, '')
-  return message
-}
-
-/**
- * notify to google home
- * @param {Error} error The error object
- * @param {string} message The message for notification
- */
-const notify = (error, message) => {
-  if (error) {
-    console.error(error)
-  }
-  console.info(message)
-  voice.speaker(voice.SPEAKER.HIKARI).speak(message, (error, buf) => {
-    if (error) {
-      console.error(error)
-    }
-    fs.writeFileSync('./tmp/tmp.wav', buf, 'binary')
-  })
-  googlehome.play('http://' + config.server.ip + ':3000/tmp.wav', response => {
-    console.info(response)
-  })
-}
-
-if (require.main === module) {
-  main()
-}
+main()
