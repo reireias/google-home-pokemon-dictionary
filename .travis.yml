@@ -2,6 +2,8 @@
 language: node_js
 node_js:
   - 'lts/*'
+env:
+  secure: dM59kLfCJyhynU/GdMW0w/d4gvigaXb/oQLjOwoUx41otwaIV8D35Yjm1TqN+aa4KmCe5u8ARkbjsHKyjeP/iJrtdoqea+Oaz5WwNc+kTB5YW/nz+1oSBPdjYyQSgWJovSEWhu6vFo7WD9GUGElJNVQ3/VpTxZtd9qWgNJjjY9GmobZi7joBN3mEXbuRlSZ9tr8NNrBT1Qx7Dh4/KxhRDcmfqMMv2Sc23eLo2VCQyy5adYWWxz8Zrn70nenTBejGm5quW/iy8i0QRleXMrXGqwv6yOvudq3gGqVtjm8R7yzWzVvLQOprqjmB4ffK+ZYgij/skvJvVrUdK6MtHsx5cRyH/3+hNElLj8RItEwzsEfoJwaS7ekDeefzT+M67FgB1Ux6tueGR1CenSDAPjpkQZZDuLluUypc5NrfOoIdETnErVKvy/mCoxf5nf4knDDp13Es9QSCHPeza+ZyUDPgR9hx2OEMC84nkCGNWFff8FbGp3CqvPOd8/YMqoUUqgvOk90oxbgoVZCoaobQA+QYvMzb/r+/t0Zp3Xcr6yzxSzLqZheHwL2XMsxcE01LsnvANGcvFcyvBsolr183JF9HVuYce/5Nj2D/ReqvEc9vLtGHM8B2y7Iey2QIJQunu0ggXbuU3CXE/v6KZ7PzAs5pEm3adNQrJQ6SIok6RrmvCy4=
 before_install:
   - sudo apt-get install -y git-core libnss-mdns libavahi-compat-libdnssd-dev
 script:
