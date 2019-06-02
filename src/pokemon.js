@@ -6,6 +6,10 @@ const POKEMON_ID_MAP = require('./pokemon.json')
 const BASE_URL = 'https://pokeapi.co/api/v2/pokemon-species'
 
 exports.getData = async name => {
+  if (name === 'random') {
+    const names = Object.keys(POKEMON_ID_MAP)
+    name = names[Math.floor(Math.random() * names.length)]
+  }
   if (!(name in POKEMON_ID_MAP)) {
     return null
   }

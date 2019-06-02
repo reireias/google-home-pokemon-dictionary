@@ -1,7 +1,7 @@
 const test = require('ava')
 const pokemon = require('../src/pokemon.js')
 
-test('flaverText', async t => {
+test('flavorText', async t => {
   const data = await pokemon.getData('フシギダネ')
   t.is(data.name, 'フシギダネ')
   t.is(data.genus, 'たねポケモン')
@@ -11,7 +11,14 @@ test('flaverText', async t => {
   )
 })
 
-test('flaverText not found', async t => {
+test('flavorText not found', async t => {
   const data = await pokemon.getData('not exist')
   t.is(data, null)
+})
+
+test('Random', async t => {
+  const data = await pokemon.getData('random')
+  t.true(data.name !== null)
+  t.true(data.genus !== null)
+  t.true(data.flavorText !== null)
 })
