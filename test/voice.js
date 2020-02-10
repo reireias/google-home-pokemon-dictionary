@@ -1,4 +1,3 @@
-require('dotenv').config()
 const test = require('ava')
 const fs = require('fs')
 const voice = require('../src/voice')
