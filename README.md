@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/reireias/google-home-pokemon-dictionary.svg?branch=master)](https://travis-ci.org/reireias/google-home-pokemon-dictionary)
+![image](https://github.com/reireias/google-home-pokemon-dictionary/workflows/image/badge.svg) ![test](https://github.com/reireias/google-home-pokemon-dictionary/workflows/test/badge.svg)
 # google-home-pokemon-dictionary
 Pokemon dictionaryn Google Home
 
